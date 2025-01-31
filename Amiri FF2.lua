@@ -287,7 +287,7 @@ function Ocean:NewWindow()
 			Size = UDim2.fromScale(0.7, 0.055),
 			Parent = Main,
 			BackgroundTransparency = 1,
-			Font = Enum.Font.Bold,
+			Font = Enum.Font.GothamBold,
 			Text = 'Amiri / FF2 / <font color="#FFFFFF">'..Title..'</font>',
 			TextScaled = true,
 			TextXAlignment = Enum.TextXAlignment.Left,
