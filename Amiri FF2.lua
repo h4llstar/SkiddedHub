@@ -3218,15 +3218,31 @@ local BeOn = false
 				msVersion = v
 			end,
 		})
-		t1:Slider("Mag Range", {
-			Default  = 20,
+		t1:Slider("Legit Mag Range", {
+			Default  = 0,
 			Min		 = 0,
-			Max		 = 30,
+			Max		 = 10,
+			Callback = function(v)
+				msSecondVerRange = v
+			end,
+		})
+		t1:Slider("Regular Mag Range", {
+			Default  = 0,
+			Min		 = 0,
+			Max		 = 20,
 			Callback = function(v)
 				msSecondVerRange = v
 			end,
 		})
 
+	t1:Slider("Blatant Mag Range", {
+			Default  = 0,
+			Min		 = 0,
+			Max		 = 31,
+			Callback = function(v)
+				msSecondVerRange = v
+			end,
+		})
 		
 		getgenv().VIM = game:GetService("VirtualInputManager")
 getgenv().plrrrr = game:GetService("Players").LocalPlayer
@@ -3537,13 +3553,70 @@ end)
 				jps = v
 			end,
 		})
-		t2:Toggle("Speed Boost | F", {
+		local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local lp = Players.LocalPlayer
+local char = lp.Character or lp.CharacterAdded:Wait()
+local hrp = char:FindFirstChild("HumanoidRootPart")
+local hum = char:FindFirstChild("Humanoid")
+
+-- Speed settings
+local speedMultiplier = 3
+local speedBoostEnabled = false
+local connection
+
+-- Update character reference when respawning
+lp.CharacterAdded:Connect(function(character)
+    char = character
+    hrp = char:FindFirstChild("HumanoidRootPart")
+    hum = char:FindFirstChild("Humanoid")
+end)
+
+-- Toggle Speed Boost
+local function onToggle(value)
+    speedBoostEnabled = value
+    if speedBoostEnabled then
+        connection = RunService.RenderStepped:Connect(function()
+            if hrp and hum and hum.MoveDirection.Magnitude > 0 then
+                -- Move in the direction the player is actually moving
+                local moveVector = hum.MoveDirection.Unit * (speedMultiplier * 10)
+                hrp.Velocity = Vector3.new(moveVector.X, hrp.Velocity.Y, moveVector.Z)
+            end
+        end)
+    else
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+    end
+end
+
+-- GUI Toggle Button
+t2:Toggle("Walkspeed", {
+    Default = false,
+    Callback = function(state)
+        onToggle(state)
+    end,
+})
+
+-- GUI Slider to Adjust Speed
+t2:Slider("Walkspeed Strength", {
+    Default = 2,
+    Min = 2,
+    Max = 9,
+    Callback = function(value)
+        speedMultiplier = value
+    end,
+})
+
+
+		t2:Toggle("Click to TP | F", {
 			Default  = false,
 			Callback = function(v)
 				LookVectorSpeed = v
 			end,
 		})
-		t2:Slider("Speed Boost Strength", {
+		t2:Slider("TP Strength", {
 			Default  = 3,
 			Min		 = 0,
 			Max		 = 5,
@@ -3577,7 +3650,7 @@ end)
 
 
 
-		t2:Toggle("Angle Enhancer (Dont Use with JP)", {
+		t2:Toggle("Angle Enhancer", {
 			Default  = false,
 			Callback = function(v)
 				local jpOnDudee = v
@@ -3836,8 +3909,60 @@ t6:Toggle("Destroy Uniform", {
         end
     end
 })
+-- Global Variables
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local lp = Players.LocalPlayer
+local char = lp.Character or lp.CharacterAdded:Wait()
+local hrp = char:FindFirstChild("HumanoidRootPart")
+local hum = char:FindFirstChild("Humanoid")
 
-	
+-- Speed settings
+local speedMultiplier = 3
+local speedBoostEnabled = false
+local connection
 
-	
+-- Update character reference when respawning
+lp.CharacterAdded:Connect(function(character)
+    char = character
+    hrp = char:FindFirstChild("HumanoidRootPart")
+    hum = char:FindFirstChild("Humanoid")
+end)
+
+-- Toggle Speed Boost
+local function onToggle(value)
+    speedBoostEnabled = value
+    if speedBoostEnabled then
+        connection = RunService.RenderStepped:Connect(function()
+            if hrp and hum and hum.MoveDirection.Magnitude > 0 then
+                -- Move in the direction the player is actually moving
+                local moveVector = hum.MoveDirection.Unit * (speedMultiplier * 10)
+                hrp.Velocity = Vector3.new(moveVector.X, hrp.Velocity.Y, moveVector.Z)
+            end
+        end)
+    else
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+    end
+end
+
+-- GUI Toggle Button
+t2:Toggle("Walkspeed", {
+    Default = false,
+    Callback = function(state)
+        onToggle(state)
+    end,
+})
+
+-- GUI Slider to Adjust Speed
+t2:Slider("Walkspeed Strength", {
+    Default = 2,
+    Min = 2,
+    Max = 7.5,
+    Callback = function(value)
+        speedMultiplier = value
+    end,
+})
 
