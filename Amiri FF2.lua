@@ -3603,7 +3603,7 @@ t2:Toggle("Walkspeed", {
 t2:Slider("Walkspeed Strength", {
     Default = 2,
     Min = 2,
-    Max = 9,
+    Max = 4.5,
     Callback = function(value)
         speedMultiplier = value
     end,
@@ -3909,60 +3909,5 @@ t6:Toggle("Destroy Uniform", {
         end
     end
 })
--- Global Variables
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local lp = Players.LocalPlayer
-local char = lp.Character or lp.CharacterAdded:Wait()
-local hrp = char:FindFirstChild("HumanoidRootPart")
-local hum = char:FindFirstChild("Humanoid")
 
--- Speed settings
-local speedMultiplier = 3
-local speedBoostEnabled = false
-local connection
-
--- Update character reference when respawning
-lp.CharacterAdded:Connect(function(character)
-    char = character
-    hrp = char:FindFirstChild("HumanoidRootPart")
-    hum = char:FindFirstChild("Humanoid")
-end)
-
--- Toggle Speed Boost
-local function onToggle(value)
-    speedBoostEnabled = value
-    if speedBoostEnabled then
-        connection = RunService.RenderStepped:Connect(function()
-            if hrp and hum and hum.MoveDirection.Magnitude > 0 then
-                -- Move in the direction the player is actually moving
-                local moveVector = hum.MoveDirection.Unit * (speedMultiplier * 10)
-                hrp.Velocity = Vector3.new(moveVector.X, hrp.Velocity.Y, moveVector.Z)
-            end
-        end)
-    else
-        if connection then
-            connection:Disconnect()
-            connection = nil
-        end
-    end
-end
-
--- GUI Toggle Button
-t2:Toggle("Walkspeed", {
-    Default = false,
-    Callback = function(state)
-        onToggle(state)
-    end,
-})
-
--- GUI Slider to Adjust Speed
-t2:Slider("Walkspeed Strength", {
-    Default = 2,
-    Min = 2,
-    Max = 7.5,
-    Callback = function(value)
-        speedMultiplier = value
-    end,
-})
 
