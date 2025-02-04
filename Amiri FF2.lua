@@ -3650,7 +3650,7 @@ t2:Slider("Walkspeed Strength", {
 
 
 		
-		})
+
 		t7:Toggle("Anti Jam", {
 			Default  = false,
 			Callback = function(v)
