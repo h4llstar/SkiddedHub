@@ -3603,7 +3603,7 @@ t2:Toggle("Walkspeed", {
 t2:Slider("Walkspeed Strength", {
     Default = 2,
     Min = 2,
-    Max = 4.5,
+    Max = 3.5,
     Callback = function(value)
         speedMultiplier = value
     end,
@@ -3649,13 +3649,7 @@ t2:Slider("Walkspeed Strength", {
 })
 
 
-
-		t2:Toggle("Angle Enhancer", {
-			Default  = false,
-			Callback = function(v)
-				local jpOnDudee = v
-				onToggle2(jpOnDudee)
-			end,
+		
 		})
 		t7:Toggle("Anti Jam", {
 			Default  = false,
