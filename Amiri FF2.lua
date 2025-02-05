@@ -3511,62 +3511,48 @@ UIS.InputBegan:Connect(function(input)
     end
 end)
 
-		local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
-local lp = Players.LocalPlayer
-local char = lp.Character or lp.CharacterAdded:Wait()
-local jps = 50
-local jumpPowerEnabled = false
-local connection
-
--- Function to update character references
-local function updateCharacterReferences(character)
-    char = character or lp.Character
-end
-
--- Listen for character respawn
-lp.CharacterAdded:Connect(updateCharacterReferences)
-if lp.Character then updateCharacterReferences(lp.Character) end
-
--- Toggle Jump Power
-local function onToggle(enabled)
-    jumpPowerEnabled = enabled
-    if jumpPowerEnabled then
-        connection = RunService.RenderStepped:Connect(function()
-            if char then
-                local hrp = char:FindFirstChild("HumanoidRootPart")
-                local hum = char:FindFirstChild("Humanoid")
-                if hrp and hum and hum.FloorMaterial == Enum.Material.Grass and hum.Jump then
-                    hrp.Velocity = Vector3.new(0, jps * 1, 0) -- Adjusted for smoother control
+		local jps = 50
+        local jumpPowerEnabled = false
+        local connection
+        local lp = Players.LocalPlayer
+        local char = plr.Character
+        lp.CharacterAdded:Connect(function(character)
+            char = character
+        end)
+        local function onToggle(Value)
+            jumpPowerEnabled = Value
+            if jumpPowerEnabled then
+                connection = game:GetService("RunService").RenderStepped:Connect(function()
+                    local upWard = Vector3.new(0, 10, 0)
+                    local lp = Players.LocalPlayer
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    local hum = char and char:FindFirstChild("Humanoid")
+                    local newJPS = (jps / 10)
+                    if hrp and hum and hum.FloorMaterial == Enum.Material.Grass and hum.Jump then
+                        hrp.Velocity = upWard * newJPS
+                    end
+                end)
+            else
+                if connection then
+                    connection:Disconnect()
+                    connection = nil
                 end
             end
-        end)
-    else
-        if connection then
-            connection:Disconnect()
-            connection = nil
-        end
-    end
-end
-
--- GUI Toggle Button
-t2:Toggle("Jump Power", {
-    Default = false,
-    Callback = function(state)
-        onToggle(state)
-    end,
-})
-
--- GUI Slider to Adjust Jump Strength
-t2:Slider("Jump Power Strength", {
-    Default = 50,
-    Min = 50,
-    Max = 70,
-    Callback = function(value)
-        jps = value
-    end,
-})
+        end 	t2:Toggle("Jump Power", {
+			Default  = false,
+			Callback = function(v)
+				local jpOnDude = v
+				onToggle(jpOnDude)
+			end,
+		})
+		t2:Slider("Jump Power Strength", {
+			Default  = 50,
+			Min		 = 50,
+			Max		 = 70,
+			Callback = function(v)
+				jps = v
+			end,
+		})
 		local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
