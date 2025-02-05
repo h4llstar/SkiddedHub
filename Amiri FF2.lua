@@ -3243,6 +3243,15 @@ local BeOn = false
 				msSecondVerRange = v
 			end,
 		})
+
+	t1:Slider("Godlike Mag Range", {
+			Default  = 0,
+			Min		 = 0,
+			Max		 = 50,
+			Callback = function(v)
+				msSecondVerRange = v
+			end,
+		})
 		
 		getgenv().VIM = game:GetService("VirtualInputManager")
 getgenv().plrrrr = game:GetService("Players").LocalPlayer
