@@ -3601,9 +3601,9 @@ t2:Toggle("Walkspeed", {
 
 -- GUI Slider to Adjust Speed
 t2:Slider("Walkspeed Strength", {
-    Default = 3,
-    Min = 1,
-    Max = 7.5,
+    Default = 2,
+    Min = 2,
+    Max = 10,
     Callback = function(value)
         speedMultiplier = value
     end,
