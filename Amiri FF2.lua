@@ -3623,7 +3623,7 @@ UIS.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 -- GUI Toggle Button
-t2:Toggle("Walkspeed", {
+t2:Toggle("Ski on Grass", {
     Default = false,
     Callback = function(state)
         onToggle(state)
@@ -3631,10 +3631,10 @@ t2:Toggle("Walkspeed", {
 })
 
 -- GUI Slider to Adjust Speed
-t2:Slider("Walkspeed Strength", {
+t2:Slider("Ski Speed", {
     Default = 3,
     Min = 1,
-    Max = 5,
+    Max = 4.5,
     Callback = function(value)
         speedMultiplier = value
     end,
