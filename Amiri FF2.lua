@@ -3592,6 +3592,36 @@ local function onToggle(value)
     end
 end
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+
+local lp = Players.LocalPlayer
+local char = lp.Character or lp.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+-- Update character reference when respawning
+lp.CharacterAdded:Connect(function(character)
+    char = character
+    hrp = char:WaitForChild("HumanoidRootPart")
+end)
+
+-- Function to stop sliding
+local function stopSliding()
+    if hrp then
+        -- Reset horizontal velocity (X and Z) while keeping vertical movement (Y)
+        hrp.Velocity = Vector3.new(0, hrp.Velocity.Y, 0)
+    end
+end
+
+-- Detect when player dives (E key)
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.E then
+        task.wait(0.15) -- Short delay to detect the dive
+        stopSliding()
+    end
+end)
+
 -- GUI Toggle Button
 t2:Toggle("Walkspeed", {
     Default = false,
