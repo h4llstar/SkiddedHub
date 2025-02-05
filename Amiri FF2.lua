@@ -3606,21 +3606,6 @@ lp.CharacterAdded:Connect(function(character)
     hrp = char:WaitForChild("HumanoidRootPart")
 end)
 
--- Function to stop sliding
-local function stopSliding()
-    if hrp then
-        -- Reset horizontal velocity (X and Z) while keeping vertical movement (Y)
-        hrp.Velocity = Vector3.new(0, hrp.Velocity.Y, 0)
-    end
-end
-
--- Detect when player dives (E key)
-UIS.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.E then
-        task.wait(0.15) -- Short delay to detect the dive
-        stopSliding()
-    end
-end)
 
 -- GUI Toggle Button
 t2:Toggle("Ski on Grass", {
