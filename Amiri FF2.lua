@@ -3557,29 +3557,28 @@ end)
 local RunService = game:GetService("RunService")
 
 local lp = Players.LocalPlayer
-local char = lp.Character or lp.CharacterAdded:Wait()
+local char, hrp, hum
 local speedMultiplier = 3
 local speedBoostEnabled = false
 local connection
 
--- Function to get fresh character references
-local function updateCharacterReferences()
-    char = lp.Character or lp.CharacterAdded:Wait()
+-- Function to update character references
+local function updateCharacterReferences(character)
+    char = character or lp.Character
+    hrp = char:WaitForChild("HumanoidRootPart")
+    hum = char:WaitForChild("Humanoid")
 end
 
--- Update character on respawn
+-- Listen for respawn updates
 lp.CharacterAdded:Connect(updateCharacterReferences)
+if lp.Character then updateCharacterReferences(lp.Character) end
 
 -- Toggle Speed Boost
-local function onToggle(value)
-    speedBoostEnabled = value
+local function onToggle(enabled)
+    speedBoostEnabled = enabled
     if speedBoostEnabled then
         connection = RunService.RenderStepped:Connect(function()
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
-            local hum = char and char:FindFirstChild("Humanoid")
-
-            if hrp and hum and hum.MoveDirection.Magnitude > 0 then
-                -- Move in the direction the player is actually moving
+            if hrp and hum and hum.MoveDirection.Magnitude > 0 and hum.FloorMaterial == Enum.Material.Grass then
                 local moveVector = hum.MoveDirection.Unit * (speedMultiplier * 10)
                 hrp.Velocity = Vector3.new(moveVector.X, hrp.Velocity.Y, moveVector.Z)
             end
@@ -3591,21 +3590,6 @@ local function onToggle(value)
         end
     end
 end
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-
-local lp = Players.LocalPlayer
-local char = lp.Character or lp.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
-
--- Update character reference when respawning
-lp.CharacterAdded:Connect(function(character)
-    char = character
-    hrp = char:WaitForChild("HumanoidRootPart")
-end)
-
 
 -- GUI Toggle Button
 t2:Toggle("Ski on Grass", {
@@ -3624,8 +3608,6 @@ t2:Slider("Ski Speed", {
         speedMultiplier = value
     end,
 })
-
-
 		t2:Toggle("Click to TP | F", {
 			Default  = false,
 			Callback = function(v)
