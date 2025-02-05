@@ -3592,7 +3592,7 @@ local function onToggle(enabled)
 end
 
 -- GUI Toggle Button
-t2:Toggle("Ski on Grass", {
+t2:Toggle("Walkspeed", {
     Default = false,
     Callback = function(state)
         onToggle(state)
@@ -3600,10 +3600,10 @@ t2:Toggle("Ski on Grass", {
 })
 
 -- GUI Slider to Adjust Speed
-t2:Slider("Ski Speed", {
+t2:Slider("Walkspeed Strength", {
     Default = 3,
     Min = 1,
-    Max = 4.5,
+    Max = 7.5,
     Callback = function(value)
         speedMultiplier = value
     end,
