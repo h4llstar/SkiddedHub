@@ -3255,40 +3255,54 @@ local BeOn = false
 		
 		getgenv().VIM = game:GetService("VirtualInputManager")
 getgenv().plrrrr = game:GetService("Players").LocalPlayer
-getgenv().charrrr = plrrrr.Character
+getgenv().charrrr = plrrrr.Character or plrrrr.CharacterAdded:Wait()  -- Ensure the character is loaded
 getgenv().kickOn = false
+
+-- Reconnect the character on CharacterAdded
 plrrrr.CharacterAdded:Connect(function(character)
     charrrr = character
 end)
+
 local autoCapOn = false
+
 if game.PlaceId ~= 8206123457 then
-	local endCaptainLine =   workspace:FindFirstChild("Models"):FindFirstChild("LockerRoomA"):FindFirstChild("FinishLine")
-	local plr = game:GetService("Players").LocalPlayer
-	local char = plr.Character or plr.CharacterAdded:Wait()
-	local hrp = char:FindFirstChild("HumanoidRootPart")
-	local autoCapOffset = Vector3.new(2.1, 2.1, 2.1)
+    -- Ensure objects are found properly
+    local endCaptainLine = workspace:FindFirstChild("Models") and workspace.Models:FindFirstChild("LockerRoomA") and workspace.Models.LockerRoomA:FindFirstChild("FinishLine")
+    
+    if not endCaptainLine then
+        warn("FinishLine not found in LockerRoomA!")
+        return
+    end
+    
+    local plr = game:GetService("Players").LocalPlayer
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    
+    if not hrp then
+        warn("HumanoidRootPart not found!")
+        return
+    end
 
-	endCaptainLine:GetPropertyChangedSignal("Position"):Connect(function()
-		if autoCapOn then
-			task.wait(0.13)
-			hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
-			task.wait(0.25)
-			hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
-			task.wait(0.25)
-			hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
-			task.wait(0.25)
-			hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
-			task.wait(0.25)
-			hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
-			task.wait(0.25)
-			hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
-			task.wait(0.25)
-			hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
-		end
-	end)
+    local autoCapOffset = Vector3.new(2.1, 2.1, 2.1)
+
+    -- Improved connection and smooth updates to CFrame
+    endCaptainLine:GetPropertyChangedSignal("Position"):Connect(function()
+        if autoCapOn then
+            local startTime = tick()
+            -- Set the character's CFrame near the FinishLine
+            local function setCFrameSmoothly()
+                if tick() - startTime >= 0.13 then
+                    hrp.CFrame = endCaptainLine.CFrame + autoCapOffset
+                end
+            end
+            -- Run the updates a few times
+            for _ = 1, 7 do
+                task.wait(0.25)
+                setCFrameSmoothly()
+            end
+        end
+    end)
 end
-
-
 
 game:GetService("Players").LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
 	
@@ -3475,10 +3489,10 @@ t5:Slider("Auto Rush Distance", {
 	end,
 })
 t5:Toggle("Auto Captain", {
-	Default  = false,
-	Callback = function(v)
-		autoCapOn = v
-	end,
+    Default = false,
+    Callback = function(v)
+        autoCapOn = v
+    end,
 })
 
 
@@ -3838,9 +3852,16 @@ Players.PlayerAdded:Connect(function(player)
     end)
 end)
 
+-- Apply big head effect for yourself when you first join
+if bigHeadsEnabled then
+    for _, player in pairs(Players:GetPlayers()) do
+        setHeadSize(player, headSizeMultiplier)
+    end
+end
+
 -- GUI Toggle for Big Heads
-t6:Toggle("Big Heads (Others)", {
-    Default = false,
+t6:Toggle("Big Head (Others)", {
+    Default = true,
     Callback = function(state)
         applyBigHeads(state)
     end,
@@ -3848,9 +3869,9 @@ t6:Toggle("Big Heads (Others)", {
 
 -- GUI Slider to Adjust Head Size
 t6:Slider("Head Size Multiplier", {
-    Default = 1,
+    Default = 0,
     Min = 1,
-    Max = 4.5,
+    Max = 6,
     Callback = function(value)
         headSizeMultiplier = value
         -- Update sizes if big heads are enabled
@@ -3897,9 +3918,9 @@ t6:Slider("Head Size Multiplier", {
 			end,
 		})
 
-_G.chatSpyEnabled = true
-_G.spyOnMyself = true
-_G.public = false
+_G.chatSpyEnabled = false
+_G.spyOnMyself = false
+_G.public = true
 _G.publicItalics = true
 
 -- Customizing private logs
@@ -3976,85 +3997,9 @@ StarterGui:SetCore("ChatMakeSystemMessage", _G.privateProperties)
 
 -- Add the toggle button for Chat Spy
 t7:Toggle("Chat Spy", {
-    Default = false,
+    Default = true,
     Callback = function(state)
         toggleChatSpy()  -- Toggle the Chat Spy on/off when the toggle is clicked
     end,
 })
 
-t6:Toggle("Destroy Uniform", {
-    Default = false,
-    Callback = function(state)
-        if state then
-            for i, v in pairs(game.workspace:GetDescendants()) do
-                if v:IsA("Model") and v.Parent.Name == game.Players.LocalPlayer.Name and v.Name == "Uniform" then
-                    v:Destroy()
-                end
-            end
-        end
-    end
-})
-
-
-
-
--- GUI Slider to Adjust Speed
-t2:Slider("Tackle TP Range", {
-    Min = 0,
-    Max = 15,
-    Def = 0,
-    Callback = function(v)
-        tprange = v
-    end,
-})
-
-local connection
-local tprange = 0  -- Default teleport range
-
--- Toggle for enabling/disabling Click Tackle TP
-t2:Toggle("Click Tackle TP", {
-    Default = false,
-    Callback = function(v)
-        if v then
-            -- Enable teleportation when toggle is on
-            connection = game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
-                local playerCharacter = game.Players.LocalPlayer.Character
-                if playerCharacter then
-                    local playerHRP = playerCharacter:FindFirstChild("HumanoidRootPart")
-                    if playerHRP then
-                        -- Loop through all descendants of workspace to find football tools
-                        for _, descendant in pairs(game.workspace:GetDescendants()) do
-                            if descendant.Name == "Football" and descendant:IsA("Tool") then
-                                local footballHRP = descendant.Parent:FindFirstChild("HumanoidRootPart")
-                                if footballHRP then
-                                    local distance = (footballHRP.Position - playerHRP.Position).Magnitude
-                                    
-                                    -- Teleport player if within range
-                                    if distance <= tprange then
-                                        playerHRP.CFrame = footballHRP.CFrame + Vector3.new(1, 1, 1)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end)
-        else
-            -- Disable teleportation when toggle is off
-            if connection then
-                connection:Disconnect()  -- Disconnect the mouse click event
-                connection = nil
-            end
-        end
-    end,
-})
-
--- Slider to adjust the teleport range
-t2:Slider("Tackle TP Range", {
-    Min = 0,
-    Max = 15,
-    Def = 0,
-    Callback = function(value)
-        tprange = value  -- Update teleport range
-    end,
-})
