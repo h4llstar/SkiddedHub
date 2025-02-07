@@ -3019,36 +3019,44 @@ local Highestpwrmode = false
 		end
 		end)
 	end)
-	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+
 local aRushOn = false
-if game.PlaceId ~= 8206123457 then
-	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local agDist = 100 -- Auto Rush Distance
 local LocalPlayer = Players.LocalPlayer
 local charplr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local hrp2 = charplr:FindFirstChild("HumanoidRootPart")
-local hum2 = charplr:FindFirstChild("Humanoid")
-local agDist = 20
-LocalPlayer.CharacterAdded:Connect(function(character)
-    charplr = character
-end)
+local hrp2, hum2
 
+-- Function to update character components when respawning
+local function updateCharacter(character)
+    charplr = character
+    hrp2 = character:WaitForChild("HumanoidRootPart", 5) -- Wait to make sure it's loaded
+    hum2 = character:WaitForChild("Humanoid", 5)
+end
+
+updateCharacter(charplr) -- Initial update
+LocalPlayer.CharacterAdded:Connect(updateCharacter) -- Update when respawning
+
+-- Function to handle auto rushing
 local function doGuarding()
-	local BallCarrier = ReplicatedStorage.Values.QB.Value
+    local QBValue = ReplicatedStorage:FindFirstChild("Values") and ReplicatedStorage.Values:FindFirstChild("QB")
+    if not QBValue or not QBValue.Value then return end -- Ensure QB value exists
+
+    local BallCarrier = QBValue.Value
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Team ~= LocalPlayer.Team and player == BallCarrier then
-			print(BallCarrier)
             local car = player.Character
-            if car  then
+            if car then
                 local hrp = car:FindFirstChild("HumanoidRootPart")
                 local hum = car:FindFirstChild("Humanoid")
                 if hrp and hrp2 and hum and hum2 then
-                    local WS = 20
-                    local distance = (hrp.Position - hrp2.Position).magnitude
+                    local WS = 20 -- Walking Speed
+                    local distance = (hrp.Position - hrp2.Position).Magnitude
                     local TimeToGet = distance / WS
                     if distance <= agDist then
-                        local equation = hrp.Position + (hum.MoveDirection * TimeToGet * WS)
-                        hum2:MoveTo(equation)
+                        local targetPos = hrp.Position + (hum.MoveDirection * TimeToGet * WS)
+                        hum2:MoveTo(targetPos)
                     end
                 end
             end
@@ -3056,14 +3064,15 @@ local function doGuarding()
     end
 end
 
+-- Continuous Auto Rush Check
 task.spawn(function()
-    while task.wait() do
+    while task.wait(0.1) do -- Running every 0.1s instead of every frame for efficiency
         if aRushOn then
             doGuarding()
         end
     end
 end)
-end
+
 	local pvon = false
     local pvstrength = 10
     local pvdist = 20
@@ -3218,36 +3227,10 @@ local BeOn = false
 				msVersion = v
 			end,
 		})
-		t1:Slider("Legit Mag Range", {
+		t1:Slider("Magnet Range", {
 			Default  = 0,
 			Min		 = 0,
-			Max		 = 10,
-			Callback = function(v)
-				msSecondVerRange = v
-			end,
-		})
-		t1:Slider("Regular Mag Range", {
-			Default  = 0,
-			Min		 = 0,
-			Max		 = 20,
-			Callback = function(v)
-				msSecondVerRange = v
-			end,
-		})
-
-	t1:Slider("Blatant Mag Range", {
-			Default  = 0,
-			Min		 = 0,
-			Max		 = 31,
-			Callback = function(v)
-				msSecondVerRange = v
-			end,
-		})
-
-	t1:Slider("Godlike Mag Range", {
-			Default  = 0,
-			Min		 = 0,
-			Max		 = 50,
+			Max		 = 35,
 			Callback = function(v)
 				msSecondVerRange = v
 			end,
@@ -3331,12 +3314,6 @@ local hum = charrrr:FindFirstChild("Humanoid")
           end
     end
 end)
-t5:Toggle("Perfect Kicker Aimbot", {
-	Default  = false,
-	Callback = function(v)
-		kickOn = v
-	end,
-})
 
 
 getgenv().antiBlockOn = false
@@ -3474,20 +3451,29 @@ t5:Slider("Auto Swat Distance", {
 		distttt = v
 	end,
 })
+-- UI Elements
 t5:Toggle("Auto Rush", {
+    Default  = false,
+    Callback = function(v)
+        aRushOn = v
+    end,
+})
+
+t5:Slider("Auto Rush Distance", {
+    Default  = 100,
+    Min      = 100,
+    Max      = 100,
+    Callback = function(v)
+        agDist = v
+    end,
+})
+t5:Toggle("Kicker Aimbot", {
 	Default  = false,
 	Callback = function(v)
-		aRushOn = v
+		kickOn = v
 	end,
 })
-t5:Slider("Auto Rush Distance", {
-	Default  = 20,
-	Min		 = 0,
-	Max		 = 30,
-	Callback = function(v)
-		agDist = v
-	end,
-})
+
 t5:Toggle("Auto Captain", {
     Default = false,
     Callback = function(v)
@@ -3796,92 +3782,98 @@ end)
 
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 
-local headSizeMultiplier = 3  -- Default multiplier (adjustable via slider)
-local bigHeadsEnabled = false  -- Toggle state
-local connections = {}
+local studSize = 1  -- Default width & length
+local studThickness = 0.2  -- Thin stud
+local studsEnabled = false
+local studParts = {}
 
--- Function to resize heads (only width and length)
-local function setHeadSize(player, size)
-    if player ~= Players.LocalPlayer then  -- Ensure it doesn't affect yourself
+-- Function to create or update stud on a player's head
+local function updateStud(player)
+    if player ~= Players.LocalPlayer then  -- Avoid affecting yourself
         local character = player.Character
         if character then
             local head = character:FindFirstChild("Head")
             if head and head:IsA("BasePart") then
-                -- Adjust width and length (X and Z), but keep height (Y) the same
-                head.Size = Vector3.new(size, head.Size.Y, size)  -- Change width and length, keep height unchanged
-                head.CanCollide = true  -- Allow standing on their head
+                local stud = studParts[player]
+
+                if not stud then
+                    -- Create a new stud
+                    stud = Instance.new("Part")
+                    stud.Name = "HeadStud"
+                    stud.CanCollide = true
+                    stud.Material = Enum.Material.SmoothPlastic
+                    stud.Color = Color3.fromRGB(0,0,0) -- **Grey**
+                    stud.Parent = character
+                    studParts[player] = stud
+
+                    -- Weld the stud to the player's head (so it moves with them)
+                    local weld = Instance.new("WeldConstraint")
+                    weld.Part0 = head
+                    weld.Part1 = stud
+                    weld.Parent = stud
+                end
+
+                -- Update stud size & position
+                stud.Size = Vector3.new(studSize, studThickness, studSize)
+                stud.Position = head.Position + Vector3.new(0, 1.2, 0) -- Slightly lower than before
             end
         end
     end
 end
 
--- Function to apply effect to all players
-local function applyBigHeads(state)
-    bigHeadsEnabled = state
+-- Function to toggle studs
+local function toggleStuds(state)
+    studsEnabled = state
     if state then
-        -- Apply to existing players
         for _, player in pairs(Players:GetPlayers()) do
-            setHeadSize(player, headSizeMultiplier)
-            -- Listen for character respawn
-            connections[player] = player.CharacterAdded:Connect(function()
-                task.wait(1)  -- Small delay to ensure character loads
-                setHeadSize(player, headSizeMultiplier)
+            updateStud(player)
+            player.CharacterAdded:Connect(function()
+                task.wait(1)
+                updateStud(player)
             end)
         end
     else
-        -- Reset heads to normal
-        for _, player in pairs(Players:GetPlayers()) do
-            setHeadSize(player, 2) -- Default head size
-            if connections[player] then
-                connections[player]:Disconnect()
-                connections[player] = nil
-            end
+        for _, stud in pairs(studParts) do
+            if stud then stud:Destroy() end
         end
+        studParts = {}
     end
 end
 
--- Detect new players and apply effect if enabled
+-- Apply to new players when they join
 Players.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function()
-        task.wait(1)  -- Small delay to allow character to load
-        if bigHeadsEnabled then
-            setHeadSize(player, headSizeMultiplier)
+        task.wait(1)
+        if studsEnabled then
+            updateStud(player)
         end
     end)
 end)
 
--- Apply big head effect for yourself when you first join
-if bigHeadsEnabled then
-    for _, player in pairs(Players:GetPlayers()) do
-        setHeadSize(player, headSizeMultiplier)
-    end
-end
-
--- GUI Toggle for Big Heads
-t6:Toggle("Big Head (Others)", {
-    Default = true,
+-- GUI Toggle
+t6:Toggle("Stud on Head", {
+    Default = false,
     Callback = function(state)
-        applyBigHeads(state)
+        toggleStuds(state)
     end,
 })
 
--- GUI Slider to Adjust Head Size
-t6:Slider("Head Size Multiplier", {
-    Default = 0,
+-- GUI Slider (Width & Length together)
+t6:Slider("Stud Size", {
+    Default = 1,
     Min = 1,
     Max = 6,
     Callback = function(value)
-        headSizeMultiplier = value
-        -- Update sizes if big heads are enabled
-        if bigHeadsEnabled then
+        studSize = value
+        if studsEnabled then
             for _, player in pairs(Players:GetPlayers()) do
-                setHeadSize(player, headSizeMultiplier)
+                updateStud(player)
             end
         end
     end,
 })
+
 
 
 
@@ -3920,7 +3912,7 @@ t6:Slider("Head Size Multiplier", {
 
 _G.chatSpyEnabled = false
 _G.spyOnMyself = false
-_G.public = true
+_G.public = false
 _G.publicItalics = true
 
 -- Customizing private logs
