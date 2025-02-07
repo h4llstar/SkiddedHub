@@ -3781,6 +3781,90 @@ t7:Toggle("Remove Weather", {
 end)
 
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local headSizeMultiplier = 3  -- Default multiplier (adjustable via slider)
+local bigHeadsEnabled = false  -- Toggle state
+local connections = {}
+
+-- Function to resize heads (only width and length)
+local function setHeadSize(player, size)
+    if player ~= Players.LocalPlayer then  -- Ensure it doesn't affect yourself
+        local character = player.Character
+        if character then
+            local head = character:FindFirstChild("Head")
+            if head and head:IsA("BasePart") then
+                -- Adjust width and length (X and Z), but keep height (Y) the same
+                head.Size = Vector3.new(size, head.Size.Y, size)  -- Change width and length, keep height unchanged
+                head.CanCollide = true  -- Allow standing on their head
+            end
+        end
+    end
+end
+
+-- Function to apply effect to all players
+local function applyBigHeads(state)
+    bigHeadsEnabled = state
+    if state then
+        -- Apply to existing players
+        for _, player in pairs(Players:GetPlayers()) do
+            setHeadSize(player, headSizeMultiplier)
+            -- Listen for character respawn
+            connections[player] = player.CharacterAdded:Connect(function()
+                task.wait(1)  -- Small delay to ensure character loads
+                setHeadSize(player, headSizeMultiplier)
+            end)
+        end
+    else
+        -- Reset heads to normal
+        for _, player in pairs(Players:GetPlayers()) do
+            setHeadSize(player, 2) -- Default head size
+            if connections[player] then
+                connections[player]:Disconnect()
+                connections[player] = nil
+            end
+        end
+    end
+end
+
+-- Detect new players and apply effect if enabled
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(1)  -- Small delay to allow character to load
+        if bigHeadsEnabled then
+            setHeadSize(player, headSizeMultiplier)
+        end
+    end)
+end)
+
+-- GUI Toggle for Big Heads
+t6:Toggle("Big Heads (Others)", {
+    Default = false,
+    Callback = function(state)
+        applyBigHeads(state)
+    end,
+})
+
+-- GUI Slider to Adjust Head Size
+t6:Slider("Head Size Multiplier", {
+    Default = 1,
+    Min = 1,
+    Max = 4.5,
+    Callback = function(value)
+        headSizeMultiplier = value
+        -- Update sizes if big heads are enabled
+        if bigHeadsEnabled then
+            for _, player in pairs(Players:GetPlayers()) do
+                setHeadSize(player, headSizeMultiplier)
+            end
+        end
+    end,
+})
+
+
+
+
 	t6:Toggle("Underground", {
 			Default  = false,
 			Callback = function(v)
@@ -3912,3 +3996,65 @@ t6:Toggle("Destroy Uniform", {
 })
 
 
+
+
+-- GUI Slider to Adjust Speed
+t2:Slider("Tackle TP Range", {
+    Min = 0,
+    Max = 15,
+    Def = 0,
+    Callback = function(v)
+        tprange = v
+    end,
+})
+
+local connection
+local tprange = 0  -- Default teleport range
+
+-- Toggle for enabling/disabling Click Tackle TP
+t2:Toggle("Click Tackle TP", {
+    Default = false,
+    Callback = function(v)
+        if v then
+            -- Enable teleportation when toggle is on
+            connection = game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
+                local playerCharacter = game.Players.LocalPlayer.Character
+                if playerCharacter then
+                    local playerHRP = playerCharacter:FindFirstChild("HumanoidRootPart")
+                    if playerHRP then
+                        -- Loop through all descendants of workspace to find football tools
+                        for _, descendant in pairs(game.workspace:GetDescendants()) do
+                            if descendant.Name == "Football" and descendant:IsA("Tool") then
+                                local footballHRP = descendant.Parent:FindFirstChild("HumanoidRootPart")
+                                if footballHRP then
+                                    local distance = (footballHRP.Position - playerHRP.Position).Magnitude
+                                    
+                                    -- Teleport player if within range
+                                    if distance <= tprange then
+                                        playerHRP.CFrame = footballHRP.CFrame + Vector3.new(1, 1, 1)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            -- Disable teleportation when toggle is off
+            if connection then
+                connection:Disconnect()  -- Disconnect the mouse click event
+                connection = nil
+            end
+        end
+    end,
+})
+
+-- Slider to adjust the teleport range
+t2:Slider("Tackle TP Range", {
+    Min = 0,
+    Max = 15,
+    Def = 0,
+    Callback = function(value)
+        tprange = value  -- Update teleport range
+    end,
+})
