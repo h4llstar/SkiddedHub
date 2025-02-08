@@ -3238,6 +3238,12 @@ local BeOn = false
 			end,
 		})
 
+		t1:Toggle("Magnet Hitbox", {
+			Default  = false,
+			Callback = function(v)
+				on3 = v
+			end,
+		})
 
 
 
@@ -3713,6 +3719,14 @@ t2:Slider("Walkspeed Strength", {
 			Max		 = 5,
 			Callback = function(v)
 				Speedboostnum = v
+			end,
+		})
+
+		t2:Toggle("Angle Enhance", {
+			Default  = false,
+			Callback = function(v)
+				local jpOnDudee = v
+				onToggle2(jpOnDudee)
 			end,
 		})
 
