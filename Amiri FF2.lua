@@ -3209,6 +3209,8 @@ local BeOn = false
 
 		local OceanLib = Ocean:NewWindow()
 		local t1 = OceanLib:Tab("Catching", 10723426986)
+		local t3 = OceanLib:Tab("Quarterback", 10723426986)
+		local t4 = OceanLib:Tab("QB Configs", 10723426986)
 		local t5 = OceanLib:Tab("Automatics", 10723426986)
 		local t6 = OceanLib:Tab("Trolling", 10723426986)
 		local t7 = OceanLib:Tab("Misc", 10723426986)
@@ -3233,6 +3235,88 @@ local BeOn = false
 			Max		 = 35,
 			Callback = function(v)
 				msSecondVerRange = v
+			end,
+		})
+
+
+
+
+
+
+		t3:Toggle("QB Aimbot", {
+			Default  = false,
+			Callback = function(v)
+				state = v
+			end,
+		})
+		t3:Toggle("Auto Angle", {
+			Default  = false,
+			Callback = function(v)
+				AutoAngie = v
+			end,
+		})
+		t3:Toggle("Auto Power", {
+			Default  = false,
+			Callback = function(v)
+				AutoPowa = v
+			end,
+		})
+		t3:Toggle("High Power Mode", {
+			Default  = false,
+			Callback = function(v)
+				Highestpwrmode = v
+			end,
+		})
+		t3:Toggle("Auto Mode Selection", {
+			Default  = false,
+			Callback = function(v)
+				autopmode = v
+			end,
+		})
+		t3:Toggle("Auto Select WR", {
+			Default  = false,
+			Callback = function(v)
+				autoswr = v
+			end,
+		})
+		t3:Toggle("R and F to Change Angle", {
+			Default  = false,
+			Callback = function(v)
+				print("ok")
+			end,
+		})
+		t3:Toggle("Z and X to Change Power", {
+			Default  = false,
+			Callback = function(v)
+				print("ok")
+			end,
+		})
+		t3:Toggle("C to Change Modes", {
+			Default  = false,
+			Callback = function(v)
+				print("ok")
+			end,
+		})
+		t3:Toggle("Q to Lock WR", {
+			Default  = false,
+			Callback = function(v)
+				print("ok")
+			end,
+		})
+
+
+		t4:Toggle("Custom Lead", {
+			Default  = false,
+			Callback = function(v)
+				customLeads = v
+			end,
+		})
+		t4:Slider("Lead Distance", {
+			Default  = 0,
+			Min		 = 0,
+			Max		 = 20,
+			Callback = function(v)
+				customLead = v
 			end,
 		})
 		
@@ -3612,7 +3696,7 @@ t2:Toggle("Walkspeed", {
 t2:Slider("Walkspeed Strength", {
     Default = 2,
     Min = 2,
-    Max = 10,
+    Max = 7,
     Callback = function(value)
         speedMultiplier = value
     end,
