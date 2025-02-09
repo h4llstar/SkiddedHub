@@ -3238,13 +3238,7 @@ local BeOn = false
 			end,
 		})
 
-		t1:Toggle("Magnet Hitbox", {
-			Default  = false,
-			Callback = function(v)
-				on3 = v
-			end,
-		})
-
+	
 
 
 
@@ -3722,6 +3716,7 @@ t2:Slider("Walkspeed Strength", {
 			end,
 		})
 
+
 		t2:Toggle("Angle Enhance", {
 			Default  = false,
 			Callback = function(v)
@@ -3729,7 +3724,7 @@ t2:Slider("Walkspeed Strength", {
 				onToggle2(jpOnDudee)
 			end,
 		})
-
+	
 		t2:Toggle("Infinite Jump", {
 	Default  = false,
 	Callback = function(state)
