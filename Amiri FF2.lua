@@ -3041,7 +3041,10 @@ LocalPlayer.CharacterAdded:Connect(updateCharacter) -- Update when respawning
 -- Function to handle auto rushing
 local function doGuarding()
     local QBValue = ReplicatedStorage:FindFirstChild("Values") and ReplicatedStorage.Values:FindFirstChild("QB")
-    if not QBValue or not QBValue.Value then return end -- Ensure QB value exists
+    if not QBValue or not QBValue.Value then 
+        warn("QB Value missing or nil") 
+        return 
+    end
 
     local BallCarrier = QBValue.Value
     for _, player in pairs(Players:GetPlayers()) do
@@ -3051,12 +3054,12 @@ local function doGuarding()
                 local hrp = car:FindFirstChild("HumanoidRootPart")
                 local hum = car:FindFirstChild("Humanoid")
                 if hrp and hrp2 and hum and hum2 then
-                    local WS = 20 -- Walking Speed
+                    local WS = 20
                     local distance = (hrp.Position - hrp2.Position).Magnitude
-                    local TimeToGet = distance / WS
+
                     if distance <= agDist then
-                        local targetPos = hrp.Position + (hum.MoveDirection * TimeToGet * WS)
-                        hum2:MoveTo(targetPos)
+                        local targetPos = hrp.Position + (hrp.Velocity * 0.1) -- Predict movement using velocity
+                        hrp2.CFrame = CFrame.new(targetPos) -- Directly move the player
                     end
                 end
             end
