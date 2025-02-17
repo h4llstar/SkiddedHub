@@ -3019,7 +3019,7 @@ local Highestpwrmode = false
 		end
 		end)
 	end)
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage") 
 local Players = game:GetService("Players")
 
 local aRushOn = false
@@ -3041,10 +3041,7 @@ LocalPlayer.CharacterAdded:Connect(updateCharacter) -- Update when respawning
 -- Function to handle auto rushing
 local function doGuarding()
     local QBValue = ReplicatedStorage:FindFirstChild("Values") and ReplicatedStorage.Values:FindFirstChild("QB")
-    if not QBValue or not QBValue.Value then 
-        warn("QB Value missing or nil") 
-        return 
-    end
+    if not QBValue or not QBValue.Value then return end -- Ensure QB value exists
 
     local BallCarrier = QBValue.Value
     for _, player in pairs(Players:GetPlayers()) do
@@ -3053,13 +3050,14 @@ local function doGuarding()
             if car then
                 local hrp = car:FindFirstChild("HumanoidRootPart")
                 local hum = car:FindFirstChild("Humanoid")
-                if hrp and hrp2 and hum and hum2 then
-                    local WS = 20
+                local hasBall = car:FindFirstChild("Football") -- Check if the player is holding the ball
+                if hrp and hrp2 and hum and hum2 and hasBall then
+                    local WS = 20 -- Walking Speed
                     local distance = (hrp.Position - hrp2.Position).Magnitude
-
+                    local TimeToGet = distance / WS
                     if distance <= agDist then
-                        local targetPos = hrp.Position + (hrp.Velocity * 0.1) -- Predict movement using velocity
-                        hrp2.CFrame = CFrame.new(targetPos) -- Directly move the player
+                        local targetPos = hrp.Position + (hum.MoveDirection * TimeToGet * WS)
+                        hum2:MoveTo(targetPos)
                     end
                 end
             end
@@ -3212,7 +3210,6 @@ local BeOn = false
 
 		local OceanLib = Ocean:NewWindow()
 		local t1 = OceanLib:Tab("Catching", 10723426986)
-		local t3 = OceanLib:Tab("Quarterback", 10723426986)
 		local t4 = OceanLib:Tab("QB Configs", 10723426986)
 		local t5 = OceanLib:Tab("Automatics", 10723426986)
 		local t6 = OceanLib:Tab("Trolling", 10723426986)
@@ -3246,82 +3243,6 @@ local BeOn = false
 
 
 
-		t3:Toggle("QB Aimbot", {
-			Default  = false,
-			Callback = function(v)
-				state = v
-			end,
-		})
-		t3:Toggle("Auto Angle", {
-			Default  = false,
-			Callback = function(v)
-				AutoAngie = v
-			end,
-		})
-		t3:Toggle("Auto Power", {
-			Default  = false,
-			Callback = function(v)
-				AutoPowa = v
-			end,
-		})
-		t3:Toggle("High Power Mode", {
-			Default  = false,
-			Callback = function(v)
-				Highestpwrmode = v
-			end,
-		})
-		t3:Toggle("Auto Mode Selection", {
-			Default  = false,
-			Callback = function(v)
-				autopmode = v
-			end,
-		})
-		t3:Toggle("Auto Select WR", {
-			Default  = false,
-			Callback = function(v)
-				autoswr = v
-			end,
-		})
-		t3:Toggle("R and F to Change Angle", {
-			Default  = false,
-			Callback = function(v)
-				print("ok")
-			end,
-		})
-		t3:Toggle("Z and X to Change Power", {
-			Default  = false,
-			Callback = function(v)
-				print("ok")
-			end,
-		})
-		t3:Toggle("C to Change Modes", {
-			Default  = false,
-			Callback = function(v)
-				print("ok")
-			end,
-		})
-		t3:Toggle("Q to Lock WR", {
-			Default  = false,
-			Callback = function(v)
-				print("ok")
-			end,
-		})
-
-
-		t4:Toggle("Custom Lead", {
-			Default  = false,
-			Callback = function(v)
-				customLeads = v
-			end,
-		})
-		t4:Slider("Lead Distance", {
-			Default  = 0,
-			Min		 = 0,
-			Max		 = 20,
-			Callback = function(v)
-				customLead = v
-			end,
-		})
 		
 		getgenv().VIM = game:GetService("VirtualInputManager")
 getgenv().plrrrr = game:GetService("Players").LocalPlayer
