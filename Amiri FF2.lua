@@ -1010,7 +1010,7 @@ task.spawn(function()
 						elseif magType == "Legit" then
 							part.Size = Vector3.new(legmagdist, legmagdist, legmagdist)
 						elseif magType == "League" then
-							part.Size = Vector3.new(leaugdist, leaugdist, leaugdist)
+							part.Size = Vector3.new(leaguedist, leaguedist, leaguedist)
 						end
 						part.CFrame = c.CFrame
 					end
