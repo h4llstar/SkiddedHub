@@ -160,7 +160,7 @@ function Ocean:NewWindow()
 		Parent = Main,
 		BackgroundTransparency = 1,
 		Font = Enum.Font.GothamBold,
-		Text = '<font color="#FFFFFF">Amiri</font>',
+		Text = '<font color="#FFFFFF">Wiiii</font>',
 		TextScaled = true,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,
@@ -288,7 +288,7 @@ function Ocean:NewWindow()
 			Parent = Main,
 			BackgroundTransparency = 1,
 			Font = Enum.Font.GothamBold,
-			Text = 'Amiri / FF2 / <font color="#FFFFFF">'..Title..'</font>',
+			Text = 'Wii / FF2 / <font color="#FFFFFF">'..Title..'</font>',
 			TextScaled = true,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center,
@@ -793,10 +793,10 @@ function Ocean:NewWindow()
 end
 local on2
 local on = false
-local legmagdist = 10
+local legmagdist = 5
 local bldist = 25
 local regdist = 20
-local leaugdist = 4
+local leaguedist = 3
 local magType = "Unknown"
 local tprange = 0
 getgenv().msVersion = "Unknown"
@@ -883,8 +883,8 @@ task.spawn(function()
 												CustomFireTouchInterest(CatchRight, Object, 0)
 												CustomFireTouchInterest(CatchRight, Object, 0)
 											end
-										elseif magType == "Leauge" then
-											if (Distance <= leaugdist) then
+										elseif magType == "League" then
+											if (Distance <= leaguedist) then
 												CustomFireTouchInterest(CatchRight, Object, 1)
 												CustomFireTouchInterest(CatchRight, Object, 1)
 												task.wait()
@@ -918,8 +918,8 @@ task.spawn(function()
 												CustomFireTouchInterest(CatchRight, Object, 0)
 												CustomFireTouchInterest(CatchRight, Object, 0)
 											end
-										elseif magType == "Leauge" then
-											if (Distance <= leaugdist) then
+										elseif magType == "League" then
+											if (Distance <= leaguedist) then
 												CustomFireTouchInterest(CatchRight, Object, 1)
 												CustomFireTouchInterest(CatchRight, Object, 1)
 												task.wait()
@@ -952,8 +952,8 @@ task.spawn(function()
 												firetouchinterest(CatchRight, Object, 0)
 												firetouchinterest(CatchRight, Object, 0)
 											end
-										elseif magType == "Leauge" then
-											if (Distance <= leaugdist) then
+										elseif magType == "League" then
+											if (Distance <= leaguedist) then
 
 												firetouchinterest(CatchRight, Object, 1)
 												firetouchinterest(CatchRight, Object, 1)
@@ -1009,7 +1009,7 @@ task.spawn(function()
 							part.Size = Vector3.new(bldist, bldist, bldist)
 						elseif magType == "Legit" then
 							part.Size = Vector3.new(legmagdist, legmagdist, legmagdist)
-						elseif magType == "Leauge" then
+						elseif magType == "League" then
 							part.Size = Vector3.new(leaugdist, leaugdist, leaugdist)
 						end
 						part.CFrame = c.CFrame
@@ -3224,7 +3224,7 @@ local BeOn = false
 		})
 		t1:Dropdown("Magnet Version", {
 			Default  = "None",
-			Options  = {"Amiri's Mags"},
+			Options = {"Legit", "Blatant", "League", "Regular"},
 			Callback = function(v)
 				msVersion = v
 			end,
@@ -3239,11 +3239,13 @@ local BeOn = false
 		})
 
 	
+             t4:Toggle("QbAimbot", {
+                     Default = false,
+                     Callback = function(v)
+                        isLocked = v
+           end
+})
 
-
-
-
-		
 		getgenv().VIM = game:GetService("VirtualInputManager")
 getgenv().plrrrr = game:GetService("Players").LocalPlayer
 getgenv().charrrr = plrrrr.Character or plrrrr.CharacterAdded:Wait()  -- Ensure the character is loaded
